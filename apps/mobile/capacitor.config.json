@@ -1,0 +1,7 @@
+{
+  "appId": "com.sabiha.erp.sales",
+  "appName": "SABIHA Sales",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "ios": { "contentInset": "always" }
+}

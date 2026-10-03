@@ -1,0 +1,76 @@
+# Builds the installers: Windows (.exe), macOS (.dmg), Android (.apk) and iOS (unsigned archive).
+# How to use: put this whole folder in a (private) GitHub repository, open the "Actions" tab,
+# choose "Build apps" → "Run workflow". Download the files from the finished run ("Artifacts").
+# Optional: Settings → Secrets and variables → Actions → Variables → add SERVER_URL
+# (e.g. https://erp.yourcompany.com) so the mobile app opens with your server already filled in.
+name: Build apps
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    defaults: { run: { working-directory: apps/desktop } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npm run dist:win
+      - uses: actions/upload-artifact@v4
+        with: { name: SABIHA-ERP-Windows-installer, path: 'apps/desktop/dist/*.exe' }
+
+  macos:
+    runs-on: macos-latest
+    defaults: { run: { working-directory: apps/desktop } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npm run dist:mac
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: 'false' }   # unsigned build; see apps/BUILD_APPS.md for signing
+      - uses: actions/upload-artifact@v4
+        with: { name: SABIHA-ERP-macOS-dmg, path: 'apps/desktop/dist/*.dmg' }
+
+  android:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/mobile } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Pre-fill server address
+        if: ${{ vars.SERVER_URL != '' }}
+        run: echo "window.APP_CONFIG = { defaultServer: '${{ vars.SERVER_URL }}' };" > www/config.js
+      - run: npm install
+      - run: npx cap sync android
+      - run: ./gradlew assembleDebug
+        working-directory: apps/mobile/android
+      - uses: actions/upload-artifact@v4
+        with: { name: SABIHA-Sales-Android-apk, path: 'apps/mobile/android/app/build/outputs/apk/debug/*.apk' }
+
+  ios:
+    runs-on: macos-latest
+    defaults: { run: { working-directory: apps/mobile } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Pre-fill server address
+        if: ${{ vars.SERVER_URL != '' }}
+        run: echo "window.APP_CONFIG = { defaultServer: '${{ vars.SERVER_URL }}' };" > www/config.js
+      - run: npm install
+      - run: npx cap sync ios
+      - name: Build unsigned archive (sign and upload it from Xcode — see apps/BUILD_APPS.md)
+        working-directory: apps/mobile/ios/App
+        run: |
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release -sdk iphoneos \
+            -archivePath $RUNNER_TEMP/SabihaSales.xcarchive CODE_SIGNING_ALLOWED=NO archive
+          cd $RUNNER_TEMP && zip -qr SabihaSales-unsigned.xcarchive.zip SabihaSales.xcarchive
+      - uses: actions/upload-artifact@v4
+        with: { name: SABIHA-Sales-iOS-unsigned-archive, path: '${{ runner.temp }}/SabihaSales-unsigned.xcarchive.zip' }

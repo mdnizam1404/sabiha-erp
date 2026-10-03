@@ -1,0 +1,26 @@
+{
+  "name": "sabiha-erp-desktop",
+  "version": "5.5.0",
+  "description": "SABIHA ERP desktop app for office users (Windows and macOS) with offline mode",
+  "author": "SABIHA IT SOLUTION PVT. LTD.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "seed": "node scripts/make-seed.js",
+    "dist:win": "npm run seed && electron-builder --win nsis --x64",
+    "dist:mac": "npm run seed && electron-builder --mac dmg --arm64 --x64",
+    "dist": "npm run seed && electron-builder"
+  },
+  "devDependencies": { "electron": "^33.2.0", "electron-builder": "^25.1.8" },
+  "build": {
+    "appId": "com.sabiha.erp.desktop",
+    "productName": "SABIHA ERP",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["src/**/*", "package.json"],
+    "extraResources": [{ "from": "seed", "to": "seed" }],
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }], "icon": "build/icon.png" },
+    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true, "createDesktopShortcut": true, "shortcutName": "SABIHA ERP" },
+    "mac": { "category": "public.app-category.business", "icon": "build/icon.png", "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }], "hardenedRuntime": false, "gatekeeperAssess": false },
+    "dmg": { "title": "SABIHA ERP" }
+  }
+}

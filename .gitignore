@@ -1,0 +1,9 @@
+node_modules/
+dist/
+data/
+.env
+apps/desktop/seed/
+apps/mobile/android/app/build/
+apps/mobile/android/.gradle/
+apps/mobile/ios/App/Pods/
+apps/mobile/ios/App/build/

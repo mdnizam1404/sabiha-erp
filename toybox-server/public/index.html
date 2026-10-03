@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#182A5C">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<script src="offline.js"></script>
+<title>SABIHA ERP — Toy Manufacturing Suite</title>
+<link rel="stylesheet" href="style.css">
+<script src="vendor/chart.umd.js"></script>
+<script src="vendor/JsBarcode.all.min.js"></script>
+<script src="vendor/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<!-- ===================== AUTH SCREEN ===================== -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-side">
+      <div id="authLogoWrap"><div class="mark" id="authMark"><img src="/assets/sabiha-logo.jpg" alt="SABIHA ERP"></div></div>
+      <h2 id="authBrandName">SABIHA ERP</h2>
+      <p>Complete business management for manufacturing — production, stock, sales, payroll and accounts, all in one place.</p>
+      <ul>
+        <li><span class="dot"></span> Real-time dashboard & production pipeline</li>
+        <li><span class="dot"></span> WhatsApp / Email / SMS reminder queue</li>
+        <li><span class="dot"></span> Employee advances, outsourcing & ledgers</li>
+        <li><span class="dot"></span> Role-based access — Admin, Manager, Sales, Accountant</li>
+      </ul>
+      <div class="auth-footer-note">This package developed by <b>SABIHA IT SOLUTION PVT. LTD.</b><br>Contact: <b><a href="mailto:sabihaitsolution@gmail.com">sabihaitsolution@gmail.com</a></b></div>
+    </div>
+
+    <div class="auth-form">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tabLoginBtn" onclick="switchAuthTab('login')">Sign In</div>
+        <div class="auth-tab" id="tabRegisterBtn" onclick="switchAuthTab('register')">Create Account</div>
+        <div class="auth-tab" id="tabCompanyBtn" onclick="switchAuthTab('company')">Register Company</div>
+      </div>
+
+      <div id="loginPane">
+        <h3>Welcome back</h3>
+        <div class="muted">Sign in to continue to your dashboard</div>
+        <div class="form-field"><label>Company Code</label><input id="loginCompany" value="DEFAULT" placeholder="Company ID" list="companyList" autocomplete="organization" onchange="lookupCompany('loginCompany','loginCompanyName')" oninput="lookupCompanySoon('loginCompany','loginCompanyName')"><div id="loginCompanyName" class="co-hint"></div></div>
+        <div class="form-field"><label>Username</label><input id="loginUser" value="ADMIN" placeholder="Username"></div>
+        <div class="form-field"><label>Password</label><input type="password" id="loginPass" placeholder="Password" value="admin"></div>
+        <div id="loginErr" class="auth-err"></div>
+        <button id="loginBtn" class="btn btn-primary btn-block" onclick="doLogin()">Sign In</button>
+        <div id="loginOtpPane" class="hidden" style="margin-top:14px;">
+          <div class="template-box">
+            <b>SMS OTP Verification</b>
+            <div class="muted" id="loginOtpTarget" style="margin-top:4px;">Enter the 6-digit OTP sent to your registered mobile number.</div>
+            <div class="form-field" style="margin-top:10px;"><label>Login OTP</label><input id="loginOtpCode" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit OTP" style="letter-spacing:4px;font-size:18px;text-align:center;"></div>
+            <div id="loginOtpErr" class="auth-err"></div>
+            <button id="loginOtpBtn" class="btn btn-primary btn-block" onclick="verifyLoginOtp()">Verify OTP &amp; Sign In</button>
+            <div class="auth-hint" style="margin-top:8px;display:flex;justify-content:space-between;"><a href="#" onclick="resendLoginOtp();return false;">Resend OTP</a><a href="#" onclick="cancelLoginOtp();return false;">Back to password</a></div>
+          </div>
+        </div>
+        <div id="loginTagline" class="auth-hint" style="display:none;"></div>
+        <div class="auth-hint" id="demoHint">First run demo: <b>ADMIN</b> / <b>admin</b></div>
+        <div class="auth-hint" style="margin-top:6px;"><a href="#" onclick="openForgotPassword(); return false;">Forgot password?</a></div>
+        <div class="auth-hint" style="margin-top:6px;">New company? <a href="#" onclick="switchAuthTab('company'); return false;">Register your company</a> &nbsp;·&nbsp; <a href="/platform.html">Platform owner sign-in</a></div>
+      </div>
+
+      <div id="forgotPane" class="hidden">
+        <h3>Reset your password</h3>
+        <div class="muted">Enter your User ID — an administrator will be notified and can reset it for you from Users &amp; Roles.</div>
+        <div class="form-field"><label>User ID</label><input id="forgotUser" placeholder="Your username"></div>
+        <div id="forgotMsg" class="auth-err" style="color:var(--green);"></div>
+        <button class="btn btn-primary btn-block" onclick="submitForgotPassword()">Notify Administrator</button>
+        <div class="auth-hint" style="margin-top:6px;"><a href="#" onclick="closeForgotPassword(); return false;">Back to Sign In</a></div>
+      </div>
+
+      <div id="registerPane" class="hidden">
+        <h3>Request an account</h3>
+        <div class="muted">Choose your company. Its administrator will approve your account and assign your role before you can sign in.</div>
+        <div class="form-field"><label>Company ID *</label><input id="regCompany" placeholder="Select or type your Company ID" list="companyList" autocomplete="off" onchange="lookupCompany('regCompany','regCompanyName')" oninput="lookupCompanySoon('regCompany','regCompanyName')">
+          <div id="regCompanyName" class="co-hint"></div></div>
+        <div class="form-field"><label>Full Name</label><input id="regName" placeholder="Your full name"></div>
+        <div class="form-field"><label>Username</label><input id="regUser" placeholder="Choose a username"></div>
+        <div class="form-field"><label>Password</label><input type="password" id="regPass" placeholder="Choose a password"></div>
+        <div class="form-field"><label>Email</label><input id="regEmail" type="email" placeholder="you@example.com"></div>
+        <div class="form-field"><label>Phone</label><input id="regPhone" placeholder="Optional if email is given"></div>
+        <div class="form-field"><label>Role Requested <span style="font-weight:400;">(your company admin makes the final decision)</span></label>
+          <select id="regRole"><option value="SALES">Sales Person</option><option value="ACCOUNTANT">Accountant</option><option value="MANAGER">Manager</option></select>
+        </div>
+        <div id="regErr" class="auth-err"></div>
+        <div id="regOk" class="auth-ok"></div>
+        <button class="btn btn-primary btn-block" onclick="doRegisterStart()">Send Verification Code</button>
+      </div>
+
+      <div id="registerCompanyPane" class="hidden">
+        <h3>Register your company</h3>
+        <div class="muted">Send a request to the platform owner. Once approved you get your own company space with your own admin login.</div>
+        <div class="form-field"><label>Company Name *</label><input id="crName" placeholder="e.g. Sunrise Toys Pvt Ltd"></div>
+        <div class="form-field"><label>Preferred Company ID <span style="font-weight:400;">(optional, e.g. SUNRISE)</span></label><input id="crCode" placeholder="3-31 letters / numbers" style="text-transform:uppercase;"></div>
+        <div class="form-field"><label>Contact Person *</label><input id="crContact" placeholder="Owner / manager name"></div>
+        <div class="form-field"><label>Email *</label><input id="crEmail" type="email" placeholder="you@company.com"></div>
+        <div class="form-field"><label>Phone</label><input id="crPhone" placeholder="Mobile number"></div>
+        <div class="form-field"><label>City</label><input id="crCity"></div>
+        <div class="form-field"><label>Admin User ID * <span style="font-weight:400;">(your login)</span></label><input id="crUser" placeholder="e.g. admin" autocomplete="off"></div>
+        <div class="form-field"><label>Admin Password * <span style="font-weight:400;">(8+ characters, letters &amp; numbers)</span></label><input id="crPass" type="password" autocomplete="new-password"></div>
+        <div class="form-field"><label>Confirm Password *</label><input id="crPass2" type="password" autocomplete="new-password"></div>
+        <div class="form-field"><label>Notes</label><textarea id="crNotes" rows="2" placeholder="Anything the platform owner should know"></textarea></div>
+        <div id="crErr" class="auth-err"></div>
+        <div id="crOk" class="auth-ok"></div>
+        <button class="btn btn-primary btn-block" onclick="doCompanyRequest()">Submit Company Request</button>
+        <div style="border-top:1px dashed var(--line);margin-top:16px;padding-top:12px;">
+          <div class="muted" style="margin-bottom:6px;">Already applied? Check your request status</div>
+          <div style="display:flex;gap:8px;"><input id="crTrackRef" placeholder="REQ-XXXXXXXX" style="flex:1;text-transform:uppercase;"><button class="btn btn-outline btn-sm" onclick="checkCompanyRequest()">Check</button></div>
+          <div id="crTrackOut" class="muted" style="margin-top:8px;font-size:12.5px;"></div>
+        </div>
+      </div>
+
+      <div id="registerOtpPane" class="hidden">
+        <h3>Verify your contact</h3>
+        <div class="muted" id="regOtpTarget">Enter the 6-digit code we sent you.</div>
+        <div class="form-field"><label>Verification Code</label><input id="regOtpCode" maxlength="6" placeholder="6-digit code" style="letter-spacing:4px; font-size:18px; text-align:center;"></div>
+        <div id="regOtpErr" class="auth-err"></div>
+        <div id="regOtpOk" class="auth-ok"></div>
+        <button class="btn btn-primary btn-block" onclick="doRegisterVerify()">Verify &amp; Create Account</button>
+        <div class="auth-hint" style="margin-top:10px; display:flex; justify-content:space-between;">
+          <a href="#" onclick="doRegisterResend(); return false;">Resend code</a>
+          <a href="#" onclick="backToRegisterForm(); return false;">Change email/phone</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<datalist id="companyList"></datalist>
+
+<!-- ===================== APP SHELL ===================== -->
+<div id="app" class="hidden">
+  <aside id="sidebar">
+    <div class="brand-row">
+      <div class="brand-mark" id="brandMark">🧸</div>
+      <div class="brand"><span id="brandName">SABIHA ERP</span><small>Manufacturing Suite</small></div>
+    </div>
+    <nav id="navHost"></nav>
+    <div class="sidebar-footer">
+      <div class="sabiha-version">SABIHA ERP v5.5.0</div>
+      <div class="credit">Package by <b>SABIHA IT SOLUTION</b><br>© All rights reserved<br>Support: <a href="mailto:sabihaitsolution@gmail.com">sabihaitsolution@gmail.com</a></div>
+    </div>
+  </aside>
+
+  <div id="main">
+    <div id="topbar">
+      <div class="topbar-left">
+        <div class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</div>
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <div class="sub" id="pageSub">Overview of your manufacturing operations</div>
+        </div>
+      </div>
+      <div class="top-right">
+        <div id="backBtnHost"></div>
+        <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+          <button class="icon-toggle" title="Notifications">🔔</button>
+          <span class="notif-badge hidden" id="notifBadge">0</span>
+          <div id="notifPanel" class="notif-panel hidden"></div>
+        </div>
+        <button class="icon-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+        <div class="clock"><b id="clockTime">--:--</b><span id="clockDate">--</span></div>
+        <div class="user-chip" onclick="toggleUserMenu()">
+          <div class="avatar" id="avatarInit">AD</div>
+          <div class="user-chip-info"><b id="userChipName">Admin</b><span id="userChipRole">ADMIN</span></div>
+          <div id="userMenu" class="user-menu hidden">
+            <div class="user-menu-item" onclick="goTo('settings')">Company Settings</div>
+            <div class="user-menu-item" onclick="goTo('users')">Users & Roles</div>
+            <div class="user-menu-item danger" onclick="doLogout()">Logout</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="planBanners"></div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div class="modal-bg" id="authErrBg" style="z-index:9999;"><div class="modal" id="authErrBox" style="max-width:460px;"></div></div>
+<div class="toast" id="toast"></div>
+<div id="printArea"></div>
+
+<script src="app.js"></script>
+<script src="returns.js"></script>
+<script src="plan.js"></script>
+<script src="premium.js"></script>
+</body>
+</html>

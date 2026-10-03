@@ -1,0 +1,22 @@
+{
+  "name": "sabiha-erp-sales-mobile",
+  "version": "5.5.0",
+  "description": "SABIHA ERP sales app for Android and iOS — works with no network and syncs automatically",
+  "scripts": {
+    "add:android": "cap add android",
+    "add:ios": "cap add ios",
+    "sync": "cap sync",
+    "android": "cap sync android && cap open android",
+    "ios": "cap sync ios && cap open ios",
+    "assets": "node scripts/make-assets.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/network": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1"
+  },
+  "devDependencies": { "@capacitor/cli": "^6.1.2" }
+}

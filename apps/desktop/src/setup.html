@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><title>SABIHA ERP — Connect</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'">
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI Variable','Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;overflow:hidden;background:linear-gradient(160deg,#070C24,#101B4D 55%,#1B1F6B)}
+body::before,body::after{content:'';position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+body::before{width:520px;height:520px;left:-120px;top:-140px;background:radial-gradient(circle,#7C5CFA,transparent 65%);animation:a 16s ease-in-out infinite}
+body::after{width:560px;height:560px;right:-160px;bottom:-180px;background:radial-gradient(circle,#22C7E8,transparent 65%);animation:b 19s ease-in-out infinite}
+@keyframes a{50%{transform:translate(90px,70px) scale(1.15)}}@keyframes b{50%{transform:translate(-80px,-60px) scale(1.12)}}
+.c{position:relative;z-index:1;background:rgba(255,255,255,.96);border-radius:26px;padding:36px;width:min(480px,92vw);box-shadow:0 40px 100px -20px rgba(4,8,30,.65);animation:in .7s cubic-bezier(.22,.8,.24,1) both}
+@keyframes in{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+.logo{width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,#F5A524,#F0566B);display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:16px;box-shadow:0 14px 30px -10px rgba(240,86,107,.7)}
+h2{margin:0 0 6px;font-size:23px;color:#151A33}p{color:#6A7494;font-size:14px;line-height:1.6;margin:0 0 6px}
+input{width:100%;padding:13px 14px;border:1.5px solid #E4E8F4;border-radius:14px;font-size:15px;margin:14px 0 6px;background:#F5F7FD;transition:all .2s}input:focus{outline:none;border-color:#4F6BFF;background:#fff;box-shadow:0 0 0 4px rgba(79,107,255,.16)}
+button{width:100%;border:0;border-radius:14px;padding:13px 18px;font-size:15px;font-weight:700;color:#fff;cursor:pointer;background:linear-gradient(135deg,#4F6BFF,#7C5CFA);box-shadow:0 14px 28px -12px rgba(79,107,255,.85);transition:transform .15s}button:hover{transform:translateY(-1px)}button:active{transform:scale(.98)}button:disabled{opacity:.6}
+#m{min-height:20px;font-size:13px;margin:6px 0 10px;color:#d93a4f;font-weight:600}.ok{color:#127a3a!important}
+</style></head><body><div class="c"><div class="logo">🧸</div>
+<h2>Connect to your SABIHA ERP server</h2><p>Enter the website address your company uses to open SABIHA ERP (for example <b>https://erp.yourcompany.com</b>). You only do this once.</p>
+<input id="u" placeholder="https://erp.yourcompany.com" autofocus><div id="m"></div><button id="b">Connect</button></div>
+<script>
+const u=document.getElementById('u'),m=document.getElementById('m'),b=document.getElementById('b');
+sabihaDesktop.getServer().then(s=>{if(s)u.value=s});
+async function go(){m.className='';m.textContent='Checking…';b.disabled=true;
+ const r=await sabihaDesktop.testServer(u.value);
+ if(!r.ok){m.textContent=r.error;b.disabled=false;return}
+ m.className='ok';m.textContent='Connected — SABIHA ERP v'+r.version;await sabihaDesktop.saveServer(r.url);}
+b.onclick=go;u.onkeydown=e=>{if(e.key==='Enter')go()};
+</script></body></html>

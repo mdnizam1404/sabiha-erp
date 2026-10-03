@@ -1,0 +1,39 @@
+{
+  "name": "sabiha-erp-server",
+  "version": "5.5.0",
+  "private": true,
+  "description": "SABIHA ERP \u2014 Manufacturing Suite (Node.js + PostgreSQL, multi-company platform)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build:exe": "node -e \"console.log('The single-file .exe build is not available in v13 (PostgreSQL worker thread). See POSTGRESQL_SETUP_v13.md')\"",
+    "validate": "node -e \"require('./lib/validate'); require('./lib/schemas'); console.log('Zod validation modules OK')\"",
+    "migrate:postgres": "node migrate-sqlite-to-postgresql.js",
+    "reset-admin": "node reset-admin-password.js",
+    "provision:company": "node provision-company.js",
+    "companies": "node provision-company.js --list"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.5",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.4.1",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.15",
+    "pdfkit": "^0.15.0",
+    "pg": "^8.13.1",
+    "pptxgenjs": "^4.0.1",
+    "qrcode": "^1.5.4",
+    "xlsx": "^0.18.5",
+    "zod": "^3.25.76"
+  },
+  "optionalDependencies": {
+    "better-sqlite3": "^11.7.0"
+  }
+}

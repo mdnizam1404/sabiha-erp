@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SABIHA ERP — Platform Owner Console</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<style>
+  body{min-height:100vh;}
+  .pf-wrap{max-width:1400px;margin:0 auto;padding:20px 24px 70px;}
+  .pf-top{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 26px;color:#fff;flex-wrap:wrap;
+    background:radial-gradient(500px 200px at 0% 0%,rgba(124,92,250,.55),transparent 70%),radial-gradient(420px 200px at 100% 100%,rgba(34,199,232,.3),transparent 70%),linear-gradient(135deg,#0B1130,#1B2A6B);
+    box-shadow:0 18px 40px -22px rgba(8,12,40,.8);}
+  .pf-top h1{font-size:19px;display:flex;flex-direction:column;} .pf-top small{opacity:.72;display:block;font-size:11.5px;font-weight:400;margin-top:2px;font-family:var(--font-body);}
+  .pf-top .btn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(8px);box-shadow:none;}
+  .pf-top .btn:hover{background:#fff;color:#1B2A6B;}
+  .pf-tabs{display:flex;gap:5px;margin:20px 0;flex-wrap:wrap;padding:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);width:fit-content;max-width:100%;}
+  .pf-tab{padding:9px 16px;border-radius:12px;cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);transition:all .22s var(--ease);white-space:nowrap;}
+  .pf-tab:hover{color:var(--ink);background:var(--paper);}
+  .pf-tab.active{background:var(--grad-primary);color:#fff;box-shadow:0 8px 18px -6px rgba(79,107,255,.65);}
+  .pf-tab .badge{margin-left:7px;padding:1px 7px;} .pf-tab.active .badge{background:rgba(255,255,255,.25);color:#fff;}
+  .pf-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px;margin-bottom:18px;}
+  .pf-card{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:17px 19px;box-shadow:var(--shadow);transition:transform .3s var(--ease),box-shadow .3s;animation:fadeUp .5s var(--ease) both;}
+  .pf-card::after{content:'';position:absolute;right:-26px;top:-26px;width:90px;height:90px;border-radius:50%;background:var(--grad-primary);opacity:.08;}
+  .pf-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+  .pf-card .n{font-family:var(--font-head);font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;} .pf-card .l{font-size:12px;color:var(--muted);font-weight:600;}
+  .pf-grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;} @media(max-width:800px){.pf-grid2{grid-template-columns:1fr;}}
+  .pf-grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:4px 16px;}
+  #loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;background:linear-gradient(160deg,#070C24,#101B4D 55%,#1B1F6B);}
+  #loginView::before,#loginView::after{content:'';position:absolute;border-radius:50%;filter:blur(70px);opacity:.55;pointer-events:none;}
+  #loginView::before{width:480px;height:480px;left:-120px;top:-120px;background:radial-gradient(circle,#7C5CFA,transparent 65%);animation:orbA 16s ease-in-out infinite;}
+  #loginView::after{width:520px;height:520px;right:-150px;bottom:-170px;background:radial-gradient(circle,#22C7E8,transparent 65%);animation:orbB 19s ease-in-out infinite;}
+  .pf-login{position:relative;z-index:1;width:100%;max-width:410px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.5);border-radius:26px;padding:34px 32px;box-shadow:0 40px 100px -20px rgba(4,8,30,.65);backdrop-filter:blur(16px);animation:cardIn .7s var(--ease) both;}
+  .pf-login h2{margin-bottom:4px;font-size:24px;} .pf-note{font-size:12.8px;color:var(--muted);margin-bottom:14px;line-height:1.6;}
+  .pf-modal-bg{position:fixed;inset:0;background:rgba(8,12,40,.55);backdrop-filter:blur(7px);display:none;align-items:center;justify-content:center;z-index:900;padding:16px;}
+  .pf-modal-bg.show{display:flex;animation:fadeIn .25s both;}
+  .pf-modal{background:var(--card);border:1px solid var(--line);border-radius:26px;max-width:1000px;width:100%;max-height:90vh;overflow:auto;padding:24px;box-shadow:var(--shadow-lg);animation:modalIn .35s var(--ease) both;}
+  .pf-modal.narrow{max-width:540px;}
+  .pf-modal h3{margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:18px;}
+  .pf-toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:rgba(21,26,51,.94);backdrop-filter:blur(12px);color:#fff;padding:12px 20px;border-radius:14px;display:none;z-index:1000;max-width:90vw;border-left:4px solid #22C7E8;box-shadow:0 20px 44px -12px rgba(0,0,0,.5);}
+  .pf-toast.show{display:block;animation:popIn .25s var(--ease);}
+  .pf-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+  .mono{font-family:ui-monospace,'Cascadia Code',Menlo,Consolas,monospace;font-size:12px;}
+  td small{color:var(--muted);}
+  .pf-sec{border:1px solid var(--line);border-radius:20px;padding:18px 20px;margin-bottom:16px;background:var(--card);box-shadow:var(--shadow);}
+  .pf-sec h4{margin:0 0 12px;font-size:14.5px;font-family:var(--font-head);}
+  .pf-bars{display:flex;align-items:flex-end;gap:7px;height:120px;padding-top:6px;}
+  .pf-bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:10px;color:var(--muted);height:100%;}
+  .pf-bars i{display:block;width:100%;max-width:28px;background:linear-gradient(180deg,#7C5CFA,#4F6BFF);border-radius:8px 8px 0 0;min-height:3px;transition:height .8s var(--ease);box-shadow:0 8px 16px -8px rgba(79,107,255,.8);}
+  .pf-bars.green i{background:linear-gradient(180deg,#22C7E8,#1FAE7C);box-shadow:0 8px 16px -8px rgba(31,174,124,.8);}
+  .pf-meter{height:9px;background:var(--paper);border-radius:8px;overflow:hidden;margin-top:4px;} .pf-meter b{display:block;height:100%;background:linear-gradient(90deg,#1FAE7C,#22C7E8);border-radius:8px;} .pf-meter.warn b{background:linear-gradient(90deg,#F5A524,#FFC857);} .pf-meter.over b{background:linear-gradient(90deg,#F0566B,#FF8A9B);}
+  .pf-chk{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;}
+  .pf-qr{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:10px 0;} .pf-qr img{border-radius:14px;box-shadow:var(--shadow);}
+  .pf-codes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:var(--paper);padding:14px;border-radius:14px;}
+  textarea.pf-ta{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius:12px;padding:10px;font-family:inherit;background:var(--paper);color:var(--ink);}
+  input[type=color]{height:42px;padding:3px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="hidden">
+  <div class="pf-login">
+    <h2>Platform Owner</h2>
+    <div class="pf-note">Sign in to manage companies, plans, backups and billing, and to monitor every company centrally.</div>
+    <div id="lgStep1">
+      <div class="form-field"><label>User ID</label><input id="lgUser" autocomplete="username"></div>
+      <div class="form-field"><label>Password</label><input id="lgPass" type="password" autocomplete="current-password"></div>
+    </div>
+    <div id="lgStep2" class="hidden">
+      <div class="form-field"><label>Verification code</label><input id="lgCode" inputmode="numeric" autocomplete="one-time-code" placeholder="6-digit code from your authenticator app" style="letter-spacing:2px;font-size:16px;text-align:center;"></div>
+      <div class="pf-note">Lost your phone? Enter one of your 8-character recovery codes instead.</div>
+    </div>
+    <div id="lgErr" class="auth-err"></div>
+    <button class="btn btn-primary btn-block" id="lgBtn">Sign In</button>
+    <div class="auth-hint" style="margin-top:12px;"><a href="/">← Back to company sign-in</a></div>
+  </div>
+</div>
+
+<div id="appView" class="hidden">
+  <div class="pf-top">
+    <div><h1>SABIHA ERP — Platform Owner Console<small id="whoami"></small></h1></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn btn-sm" id="btnRefresh">↻ Refresh</button><button class="btn btn-sm" id="btnSec">My Security</button><button class="btn btn-sm" id="btnPw">Change Password</button><button class="btn btn-sm" id="btnOut">Sign Out</button></div>
+  </div>
+  <div class="pf-wrap">
+    <div class="pf-tabs" id="tabs"></div>
+    <div id="view"></div>
+  </div>
+</div>
+
+<div class="pf-modal-bg" id="mBg"><div class="pf-modal" id="mBox"></div></div>
+<div class="pf-toast" id="toast"></div>
+<script src="premium.js"></script>
+<script src="platform.js"></script>
+</body>
+</html>
